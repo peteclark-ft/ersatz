@@ -25,3 +25,8 @@
           checkOutput: Technical output from the check
           lastUpdated: 2017-08-03T10:44:32.324709638+01:00
       ok: true
+/redirect-me:
+  get:
+    status: 301
+    headers:
+      Location: http://www.google.com
