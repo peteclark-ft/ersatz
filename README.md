@@ -74,6 +74,12 @@ Example redirect configuration to google.com:
          Location: http://www.google.com
 ```
 
+# Why is Ersatz Useful?
+
+* It's useful for local developer testing - you'd no longer need to point your local machine to real services in a test cluster.
+* `fixtures.yml` files can be committed along with the codebase, so new developers can re-use your stubs to get up and running quickly.
+* We can use it to simulate complex dependencies in CircleCI, allowing us to more easily test our OpenAPI files using DreddJS
+
 # Road Map
 
 * Support OpenAPI for more accurate stubs
