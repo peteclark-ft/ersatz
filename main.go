@@ -22,7 +22,7 @@ func main() {
 	app := cli.App("ersatz", "Mocks shit")
 	port := app.String(cli.StringOpt{
 		Name:   "port",
-		Value:  "9000",
+		Value:  "8081",
 		Desc:   "Port to run ersatz on",
 		EnvVar: "PORT",
 	})
