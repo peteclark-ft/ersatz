@@ -32,8 +32,3 @@ fixtures:
       status: 301
       headers:
         Location: http://www.google.com
-  /internalconcordances:
-    get:
-      status: 200
-      body:
-        blah: blah

@@ -14,18 +14,23 @@ func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetLevel(log.InfoLevel)
 
-	app := cli.App("ersatz", "Mocks shit")
+	app := cli.App("ersatz", "Super basic stubbing tool for sandboxed component testing.")
 	port := app.String(cli.StringOpt{
-		Name:   "port",
-		Value:  "8081",
+		Name:   "port p",
+		Value:  "9000",
 		Desc:   "Port to run ersatz on",
 		EnvVar: "PORT",
 	})
 
-	configFile := app.StringArg("FILE", "", "The fixtures config file you wish to run")
+	fixtures := app.String(cli.StringOpt{
+		Name:   "fixtures f",
+		Value:  "./.ft/fixtures.yml",
+		Desc:   "Fixtures file to use to simulate requests",
+		EnvVar: "FIXTURES",
+	})
 
 	app.Action = func() {
-		f, err := ioutil.ReadFile(*configFile)
+		f, err := ioutil.ReadFile(*fixtures)
 		if err != nil {
 			log.WithError(err).Error("Failed to read yml")
 			return
