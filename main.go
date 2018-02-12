@@ -1,17 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"io/ioutil"
-	"mime"
-	"net/http"
 	"os"
 
-	"github.com/Financial-Times/http-handlers-go/httphandlers"
-	yaml "github.com/ghodss/yaml"
-	"github.com/husobee/vestigo"
+	"github.com/ghodss/yaml"
 	"github.com/jawher/mow.cli"
-	metrics "github.com/rcrowley/go-metrics"
+	"github.com/peteclark-ft/ersatz/v1"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -36,87 +31,19 @@ func main() {
 			return
 		}
 
-		paths := make(map[string]path)
-		err = yaml.Unmarshal(f, &paths)
+		ersatz := ersatz{}
+		err = yaml.Unmarshal(f, &ersatz)
 
 		if err != nil {
 			log.WithError(err).Error("Failed to marshal yml")
 			return
 		}
 
-		mockPaths(*port, paths)
+		switch ersatz.Version {
+		case 1:
+			v1.MockPaths(*port, ersatz.Fixtures.(*v1.Fixtures))
+		}
 	}
 
 	app.Run(os.Args)
-}
-
-func mock(res resource) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		for k, v := range res.Headers {
-			w.Header().Add(k, v)
-		}
-
-		w.WriteHeader(res.Status)
-		if res.Body == nil {
-			return
-		}
-
-		contentType, ok := res.Headers["content-type"]
-		if !ok { // assume json
-			contentType = "application/json"
-		}
-
-		mediaType, _, err := mime.ParseMediaType(contentType)
-		if err != nil {
-			log.WithError(err).Error("Failed to parse media type...")
-			return
-		}
-
-		var output []byte
-
-		switch mediaType {
-		case "application/json":
-			output, err = json.Marshal(res.Body)
-		case "application/x-yaml":
-			output, err = yaml.Marshal(res.Body)
-		case "text/plain":
-			output = []byte(res.Body.(string))
-		}
-
-		if err != nil {
-			log.WithError(err).Error("Failed to marshal body...")
-			return
-		}
-
-		w.Write(output)
-	}
-}
-
-func mockPaths(port string, paths map[string]path) {
-	unmonitoredRouter := vestigo.NewRouter()
-	var r http.Handler = unmonitoredRouter
-	r = httphandlers.TransactionAwareRequestLoggingHandler(log.StandardLogger(), r)
-	r = httphandlers.HTTPMetricsHandler(metrics.DefaultRegistry, r)
-
-	for p, path := range paths {
-		for method, resource := range path {
-			switch method {
-			case "get":
-				unmonitoredRouter.Get(p, mock(resource))
-			case "post":
-				unmonitoredRouter.Post(p, mock(resource))
-			case "put":
-				unmonitoredRouter.Put(p, mock(resource))
-			case "delete":
-				unmonitoredRouter.Delete(p, mock(resource))
-			}
-		}
-	}
-
-	log.Info("Ready to simulate requests!")
-	http.Handle("/", r)
-
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatalf("Unable to start: %v", err)
-	}
 }

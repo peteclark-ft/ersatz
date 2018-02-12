@@ -18,14 +18,16 @@ First create a `fixtures.yml` file (see full example file [here](./_examples/exa
 For example, to stub an `/__health` API call, you can use the following configuration:
 
 ```
-/__health: # the path of the stub
-   get: # the http method
-      status: 200 # the response status code to use
-      headers: # a map of http response headers to values
-         content-type: application/json
-      body: # the body of the response - this will be serialised to match the content-type (if provided, otherwise json is the default)
-         id: health-check
-         ok: false
+version: 1 # the ersatz fixtures version. Releases will be backwards compatible
+fixtures:
+   /__health: # the path of the stub
+      get: # the http method
+         status: 200 # the response status code to use
+         headers: # a map of http response headers to values
+            content-type: application/json
+         body: # the body of the response - this will be serialised to match the content-type (if provided, otherwise json is the default)
+            id: health-check
+            ok: false
 ```
 
 Similarly, to stub a `/__gtg` API call:

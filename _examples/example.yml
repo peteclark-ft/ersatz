@@ -1,32 +1,39 @@
-/__gtg:
-  get:
-    status: 200
-    headers:
-      content-type: text/plain; charset=US-ASCII
-    body: OK
-/__health:
-  get:
-    status: 200
-    headers:
-      content-type: application/json
-    body:
-      schemaVersion: 1
-      systemCode: dewey-system-code
-      name: app-name
-      description: A descriptive description
-      checks:
-        - id: check-api-health
-          name: Check API Health
-          ok: false
-          severity: 1
-          businessImpact: A business impact this failure might have
-          technicalSummary: A technical description of what's gone wrong
-          panicGuide: https://dewey.ft.com/dewey-system-code.html
-          checkOutput: Technical output from the check
-          lastUpdated: 2017-08-03T10:44:32.324709638+01:00
-      ok: true
-/redirect-me:
-  get:
-    status: 301
-    headers:
-      Location: http://www.google.com
+version: 1
+fixtures:
+  /__gtg:
+    get:
+      status: 200
+      headers:
+        content-type: text/plain; charset=US-ASCII
+      body: OK
+  /__health:
+    get:
+      status: 200
+      headers:
+        content-type: application/json
+      body:
+        schemaVersion: 1
+        systemCode: dewey-system-code
+        name: app-name
+        description: A descriptive description
+        checks:
+          - id: check-api-health
+            name: Check API Health
+            ok: false
+            severity: 1
+            businessImpact: A business impact this failure might have
+            technicalSummary: A technical description of what's gone wrong
+            panicGuide: https://dewey.ft.com/dewey-system-code.html
+            checkOutput: Technical output from the check
+            lastUpdated: 2017-08-03T10:44:32.324709638+01:00
+        ok: true
+  /redirect-me:
+    get:
+      status: 301
+      headers:
+        Location: http://www.google.com
+  /internalconcordances:
+    get:
+      status: 200
+      body:
+        blah: blah
