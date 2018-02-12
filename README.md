@@ -76,6 +76,21 @@ Example redirect configuration to google.com:
          Location: http://www.google.com
 ```
 
+Example endpoint with expected `headers` and `queryParams`. Ersatz will respond with a `501 Unimplemented` to requests that do no match the configured expectations, which __should__ cause your sandbox tests to fail.
+
+```
+/expect:
+   put:
+      status: 200
+      headers:
+        x-returned-header: returned
+      expectations:
+        headers:
+          x-expected-header: expected
+        queryParams:
+          param-name: expected-this-too
+```
+
 # Why is Ersatz Useful?
 
 * It's useful for local developer testing - you'd no longer need to point your local machine to real services in a test cluster.

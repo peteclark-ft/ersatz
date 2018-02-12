@@ -32,3 +32,13 @@ fixtures:
       status: 301
       headers:
         Location: http://www.google.com
+  /expect:
+    put:
+      status: 200
+      headers:
+        x-returned-header: returned
+      expectations:
+        headers:
+          x-expected-header: expected
+        queryParams:
+          expect: expected-this-too

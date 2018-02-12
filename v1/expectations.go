@@ -1,0 +1,110 @@
+package v1
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/textproto"
+	"net/url"
+
+	log "github.com/sirupsen/logrus"
+)
+
+// NewExpectation returns a setup Expectation used for test cases.
+func NewExpectation() Expectation {
+	return Expectation{Headers: ExpectedHeaders{MIMEHeader: make(textproto.MIMEHeader)}, QueryParams: ExpectedQueryParams{Values: make(url.Values)}}
+}
+
+// Validate validates the query params and headers if they exist
+func (e *Expectation) Validate(r *http.Request) bool {
+	if err := e.QueryParams.Validate(r.URL.Query()); err != nil {
+		log.WithError(err).Error("Failed to validate request query params")
+		return false
+	}
+
+	if err := e.Headers.Validate(r.Header); err != nil {
+		log.WithError(err).Error("Failed to validate request headers")
+		return false
+	}
+
+	return true
+}
+
+// ExpectedHeaders does what it says on the tin
+type ExpectedHeaders struct {
+	textproto.MIMEHeader
+}
+
+// UnmarshalJSON supports non-array declaration of headers
+func (e *ExpectedHeaders) UnmarshalJSON(d []byte) error {
+	headers := make(map[string]string)
+	err := json.Unmarshal(d, &headers)
+	if err != nil {
+		return err
+	}
+
+	e.MIMEHeader = textproto.MIMEHeader{}
+	for k, v := range headers {
+		e.Add(k, v)
+	}
+	return nil
+}
+
+// Validate validates the expected headers against the received headers
+func (e ExpectedHeaders) Validate(actual http.Header) error {
+	for name := range e.MIMEHeader {
+		expected := e.Get(name)
+		value := actual.Get(name)
+
+		ok := Contains(expected, value)
+		if !ok {
+			return fmt.Errorf(`expected to find header '%v' with value '%v' in actual request`, name, expected)
+		}
+	}
+	return nil
+}
+
+// ExpectedQueryParams does what it says on the tin
+type ExpectedQueryParams struct {
+	url.Values
+}
+
+// UnmarshalJSON supports non-array declaration of headers
+func (e *ExpectedQueryParams) UnmarshalJSON(d []byte) error {
+	query := make(map[string]string)
+	err := json.Unmarshal(d, &query)
+	if err != nil {
+		return err
+	}
+
+	e.Values = url.Values{}
+
+	for k, v := range query {
+		e.Add(k, v)
+	}
+	return nil
+}
+
+// Validate validates the expected query params vs the actual received params for the request
+func (e ExpectedQueryParams) Validate(actual url.Values) error {
+	for name := range e.Values {
+		expected := e.Get(name)
+		value := actual.Get(name)
+
+		ok := Contains(expected, value)
+		if !ok {
+			return fmt.Errorf(`expected to find query param '%v' with value '%v' in actual request '%v'`, name, expected, actual.Encode())
+		}
+	}
+	return nil
+}
+
+// Contains compares the expected values to the actual
+func Contains(expected string, actual ...string) bool {
+	for _, v := range actual {
+		if v == expected {
+			return true
+		}
+	}
+	return false
+}
