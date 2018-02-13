@@ -1,1 +1,3 @@
 /ersatz
+/vendor/*
+!/vendor/vendor.json

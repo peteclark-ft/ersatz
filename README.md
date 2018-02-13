@@ -18,7 +18,7 @@ First create a `fixtures.yml` file (see full example file [here](./_examples/exa
 For example, to stub an `/__health` API call, you can use the following configuration:
 
 ```
-version: 1 # the ersatz fixtures version. Releases will be backwards compatible
+version: 1.0.0 # the ersatz fixtures version. Releases will be backwards compatible
 fixtures:
    /__health: # the path of the stub
       get: # the http method

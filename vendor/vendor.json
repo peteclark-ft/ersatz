@@ -1,0 +1,63 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"checksumSHA1": "a8JunoGyHfI2S8kgoCWsVRG4HfY=",
+			"path": "github.com/Financial-Times/http-handlers-go/httphandlers",
+			"revision": "229ac16f1d9ec9bca485d2dafb9ec14dc7e9ba24",
+			"revisionTime": "2017-08-09T12:10:07Z",
+			"version": "0.1.1",
+			"versionExact": "0.1.1"
+		},
+		{
+			"checksumSHA1": "8bCg/2RmH1QF5+j78OtiFXUaJ/o=",
+			"path": "github.com/ghodss/yaml",
+			"revision": "0ca9ea5df5451ffdf184b4428c902747c2c11cd7",
+			"revisionTime": "2017-03-27T23:54:44Z",
+			"version": "v1.0.0",
+			"versionExact": "v1.0.0"
+		},
+		{
+			"checksumSHA1": "pj9SotjK9FR/qiy74bV4ePDZAzQ=",
+			"path": "github.com/husobee/vestigo",
+			"revision": "f8f5b5dc2bd74408887fd4b462055e324c4cbd63",
+			"revisionTime": "2017-08-28T23:43:07Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
+		},
+		{
+			"checksumSHA1": "CF+p8ekdeU4zNQG0yj3hyIrL1O8=",
+			"path": "github.com/jawher/mow.cli",
+			"revision": "0e80ee9f63156ea1954dc2375c33a1c7e752c25c",
+			"revisionTime": "2017-10-29T18:05:40Z",
+			"version": "v1.0.3",
+			"versionExact": "v1.0.3"
+		},
+		{
+			"checksumSHA1": "0XHhI9La8A/Z8Cj6iZ+QCExAoOM=",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "d682213848ed68c0a260ca37d6dd5ace8423f5ba",
+			"revisionTime": "2017-12-05T20:32:29Z",
+			"version": "v1.0.4",
+			"versionExact": "v1.0.4"
+		},
+		{
+			"checksumSHA1": "Ua5E6ReFBwEnuWLJtVSUfOp/Pqc=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "12b6f73e6084dad08a7c6e575284b177ecafbc71",
+			"revisionTime": "2018-01-31T22:23:50Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
+		},
+		{
+			"checksumSHA1": "vZdMNF/L3AxsSPXZvDEh17qGJq0=",
+			"path": "github.com/stretchr/testify/require",
+			"revision": "12b6f73e6084dad08a7c6e575284b177ecafbc71",
+			"revisionTime": "2018-01-31T22:23:50Z",
+			"version": "v1.2.1",
+			"versionExact": "v1.2.1"
+		}
+	],
+	"rootPath": "github.com/peteclark-ft/ersatz"
+}

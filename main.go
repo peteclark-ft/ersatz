@@ -4,15 +4,17 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/Financial-Times/http-handlers-go/httphandlers"
 	"github.com/ghodss/yaml"
 	"github.com/husobee/vestigo"
 	"github.com/jawher/mow.cli"
 	"github.com/peteclark-ft/ersatz/v1"
-	metrics "github.com/rcrowley/go-metrics"
 	log "github.com/sirupsen/logrus"
 )
+
+var configureOnce = &sync.Once{}
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
@@ -34,29 +36,65 @@ func main() {
 	})
 
 	app.Action = func() {
-		f, err := ioutil.ReadFile(*fixtures)
+		yml, err := ioutil.ReadFile(*fixtures)
 		if err != nil {
-			log.WithError(err).Fatal("Failed to read fixtures file")
+			runServer(*port, nil)
+			return
 		}
 
 		ersatz := ersatz{}
-		err = yaml.Unmarshal(f, &ersatz)
-
+		err = yaml.Unmarshal(yml, &ersatz)
 		if err != nil {
-			log.WithError(err).Fatal("Failed to unmarshal yml in fixtures file")
+			log.WithError(err).Fatal("Failed to unmarshal yaml in provided fixtures file")
 		}
 
-		runServer(*port, ersatz)
+		runServer(*port, &ersatz)
 	}
 
 	app.Run(os.Args)
 }
 
-func runServer(port string, ersatz ersatz) {
+func acceptFixtures(w http.ResponseWriter, req *http.Request) {
+	yml, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.WithError(err).Error("Failed to read request body")
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+
+	ersatz := ersatz{}
+	err = yaml.Unmarshal(yml, &ersatz)
+	if err != nil {
+		log.WithError(err).Error("Failed to unmarshal yaml")
+		http.Error(w, "Failed to unmarshal yaml", http.StatusBadRequest)
+		return
+	}
+
+	configureOnce.Do(func() {
+		configureErsatz(ersatz)
+	})
+
+	log.Info("Configured fixtures via /__configure endpoint, further requests to this endpoint will not reconfigure ersatz.")
+	w.WriteHeader(http.StatusOK)
+}
+
+func runServer(port string, ersatz *ersatz) {
+	if ersatz != nil {
+		configureErsatz(*ersatz)
+	} else {
+		log.Info("No fixtures file found, ready to accept fixtures data on POST /__configure")
+		http.HandleFunc("/__configure", acceptFixtures)
+	}
+
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatalf("Unable to start: %v", err)
+	}
+}
+
+func configureErsatz(ersatz ersatz) {
 	unmonitoredRouter := vestigo.NewRouter()
 	var r http.Handler = unmonitoredRouter
 	r = httphandlers.TransactionAwareRequestLoggingHandler(log.StandardLogger(), r)
-	r = httphandlers.HTTPMetricsHandler(metrics.DefaultRegistry, r)
 
 	switch ersatz.Version {
 	case "1.0.0-rc1":
@@ -68,8 +106,4 @@ func runServer(port string, ersatz ersatz) {
 
 	log.Info("Ready to simulate requests!")
 	http.Handle("/", r)
-
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatalf("Unable to start: %v", err)
-	}
 }
