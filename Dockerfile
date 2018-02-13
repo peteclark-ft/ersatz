@@ -9,9 +9,8 @@ RUN apk --no-cache --virtual .build-dependencies add git \
   && mkdir -p $GOPATH/src/${ORG_PATH} \
   && ln -s /${PROJECT}-sources $GOPATH/src/${REPO_PATH} \
   && cd $GOPATH/src/${REPO_PATH} \
-  && go get -u \
-  # && go get -u github.com/kardianos/govendor \
-  # && $GOPATH/bin/govendor sync \
+  && go get -u github.com/kardianos/govendor \
+  && $GOPATH/bin/govendor sync \
   && go build \
   && mv ${PROJECT} /${PROJECT} \
   && apk del .build-dependencies \
