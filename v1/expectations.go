@@ -10,6 +10,43 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type Expectations []Expectation
+
+// AtLeastOneExpectationPasses verifies that for multiple expectations at least one passes successfully, allowing the simulation to proceed
+func (e Expectations) AtLeastOneExpectationPasses(r *http.Request) bool {
+	for _, expectation := range e {
+		if expectation.Validate(r) {
+			return true
+		}
+	}
+	return false
+}
+
+// UnmarshalJSON allows expectations to be declared either as an array or as a singular expectation
+func (e *Expectations) UnmarshalJSON(d []byte) error {
+	arr := make([]Expectation, 0)
+	err := json.Unmarshal(d, &arr)
+	if err == nil {
+		*e = append(*e, arr...)
+		return nil
+	}
+
+	single := Expectation{}
+	err = json.Unmarshal(d, &single)
+	if err != nil {
+		return err
+	}
+
+	*e = append(*e, single)
+	return nil
+}
+
+// Expectation contains expectations for the endpoint
+type Expectation struct {
+	Headers     ExpectedHeaders     `json:"headers"`
+	QueryParams ExpectedQueryParams `json:"queryParams"`
+}
+
 // NewExpectation returns a setup Expectation used for test cases.
 func NewExpectation() Expectation {
 	return Expectation{Headers: ExpectedHeaders{MIMEHeader: make(textproto.MIMEHeader)}, QueryParams: ExpectedQueryParams{Values: make(url.Values)}}

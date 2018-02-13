@@ -22,13 +22,7 @@ type Resource struct {
 	Status       int               `json:"status"`
 	Headers      map[string]string `json:"headers"`
 	Body         interface{}       `json:"body"`
-	Expectations *Expectation      `json:"expectations"`
-}
-
-// Expectation contains expectations for the endpoint
-type Expectation struct {
-	Headers     ExpectedHeaders     `json:"headers"`
-	QueryParams ExpectedQueryParams `json:"queryParams"`
+	Expectations Expectations      `json:"expectations"`
 }
 
 // Router allows us to test that paths are configured properly

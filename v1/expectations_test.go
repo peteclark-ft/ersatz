@@ -6,6 +6,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNoExpectationsReturnsTrue(t *testing.T) {
@@ -78,7 +79,7 @@ func TestExpectQueryParamsFailsIncorrectParam(t *testing.T) {
 	assert.False(t, ok)
 }
 
-const testYaml = `
+const expectationTestYAML = `
 headers:
    X-Expected-Header: expected
 queryParams:
@@ -87,9 +88,49 @@ queryParams:
 
 func TestUnmarshalExpectation(t *testing.T) {
 	e := Expectation{}
-	err := yaml.Unmarshal([]byte(testYaml), &e)
+	err := yaml.Unmarshal([]byte(expectationTestYAML), &e)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "expected", e.Headers.Get("x-expected-header"))
 	assert.Equal(t, "expected-this-too", e.QueryParams.Get("expect"))
+}
+
+const expectationsTestYAML = `
+headers:
+   X-Expected-Header: expected
+queryParams:
+   expect: expected-this-too
+`
+
+func TestUnmarshalExpectationsWithNoArray(t *testing.T) {
+	e := make(Expectations, 0)
+	err := yaml.Unmarshal([]byte(expectationsTestYAML), &e)
+	assert.NoError(t, err)
+
+	require.Len(t, e, 1)
+
+	assert.Equal(t, "expected", e[0].Headers.Get("x-expected-header"))
+	assert.Equal(t, "expected-this-too", e[0].QueryParams.Get("expect"))
+}
+
+const multipleExpectationsTestYAML = `
+- headers:
+    X-Expected-Header: expected
+  queryParams:
+    expect: expected-this-too
+- headers:
+    x-another-expected-header: something-else
+`
+
+func TestUnmarshalExpectationsWithArray(t *testing.T) {
+	e := make(Expectations, 0)
+	err := yaml.Unmarshal([]byte(multipleExpectationsTestYAML), &e)
+	assert.NoError(t, err)
+
+	require.Len(t, e, 2)
+
+	assert.Equal(t, "expected", e[0].Headers.Get("x-expected-header"))
+	assert.Equal(t, "expected-this-too", e[0].QueryParams.Get("expect"))
+
+	assert.Equal(t, "something-else", e[1].Headers.Get("x-another-expected-header"))
 }

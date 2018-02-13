@@ -29,7 +29,7 @@ func MockPaths(r Router, paths *Fixtures) {
 
 func mockResource(res Resource) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if res.Expectations != nil && !res.Expectations.Validate(r) {
+		if res.Expectations != nil && !res.Expectations.AtLeastOneExpectationPasses(r) {
 			w.WriteHeader(http.StatusNotImplemented)
 			return
 		}

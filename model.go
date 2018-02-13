@@ -10,7 +10,7 @@ import (
 var ErrUnsupportedVersion = errors.New("unsupported ersatz version, please confirm the fixtures.yml version number")
 
 type ersatz struct {
-	Version  int      `json:"version"`
+	Version  string   `json:"version"`
 	Fixtures fixtures `json:"fixtures"`
 }
 
@@ -20,7 +20,7 @@ type fixtures interface {
 
 func (e *ersatz) UnmarshalJSON(data []byte) error {
 	v := struct {
-		Version int `json:"version"`
+		Version string `json:"version"`
 	}{}
 
 	err := json.Unmarshal(data, &v)
@@ -35,7 +35,8 @@ func (e *ersatz) UnmarshalJSON(data []byte) error {
 	}{}
 
 	switch e.Version {
-	case 1:
+	case "1.0.0-rc1":
+	case "1.0.0":
 		f.Fixtures = &v1.Fixtures{}
 	default:
 		return ErrUnsupportedVersion

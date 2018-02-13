@@ -59,7 +59,8 @@ func runServer(port string, ersatz ersatz) {
 	r = httphandlers.HTTPMetricsHandler(metrics.DefaultRegistry, r)
 
 	switch ersatz.Version {
-	case 1:
+	case "1.0.0-rc1":
+	case "1.0.0":
 		v1.MockPaths(unmonitoredRouter, ersatz.Fixtures.(*v1.Fixtures))
 	default:
 		log.Fatal(ErrUnsupportedVersion.Error())

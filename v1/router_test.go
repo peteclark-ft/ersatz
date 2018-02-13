@@ -100,7 +100,7 @@ func TestMockResourceExpectationsFail(t *testing.T) {
 
 	res := Resource{
 		Status:       http.StatusAccepted,
-		Expectations: &e,
+		Expectations: Expectations{e},
 	}
 
 	w := httptest.NewRecorder()
@@ -108,6 +108,25 @@ func TestMockResourceExpectationsFail(t *testing.T) {
 
 	mockResource(res)(w, r)
 	assert.Equal(t, http.StatusNotImplemented, w.Code)
+}
+
+func TestMockResourceAtLeastOneExpectationPasses(t *testing.T) {
+	e1 := NewExpectation()
+	e1.QueryParams.Add("not-there", "v")
+
+	e2 := NewExpectation()
+	e1.QueryParams.Add("but-im-there", "v")
+
+	res := Resource{
+		Status:       http.StatusAccepted,
+		Expectations: Expectations{e1, e2},
+	}
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("GET", "/?but-im-there=v", nil)
+
+	mockResource(res)(w, r)
+	assert.Equal(t, http.StatusAccepted, w.Code)
 }
 
 type MockRouter struct {
