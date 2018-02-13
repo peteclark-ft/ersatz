@@ -91,6 +91,21 @@ Example endpoint with expected `headers` and `queryParams`. Ersatz will respond 
           param-name: expected-this-too
 ```
 
+Ersatz also supports multiple expectations provided in an array; at least one expectation must much each request for the simulation to proceed, otherwise, it will return a `501 Unimplemented`.
+
+```
+/expect:
+  put:
+    status: 200
+      headers:
+        x-returned-header: returned
+    expectations:
+      - headers:
+          x-expected-header: expected
+      - queryParams:
+          param-name: expected-this-too
+```
+
 # Why is Ersatz Useful?
 
 * It's useful for local developer testing - you'd no longer need to point your local machine to real services in a test cluster.
@@ -100,4 +115,4 @@ Example endpoint with expected `headers` and `queryParams`. Ersatz will respond 
 # Road Map
 
 * Support OpenAPI for more accurate stubs
-* Support assertions on requests, i.e. requires request header `X-Request-Id`, or requires query parameter `ids`
+* Comparisons between fixtures and the real API it is mocking
