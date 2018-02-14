@@ -13,7 +13,7 @@ go get github.com/peteclark-ft/ersatz
 
 # Usage
 
-First create a `fixtures.yml` file (see full example file [here](./_examples/example.yml)), to stub specific API calls.
+First create a `fixtures.yml` file (see full example file [here](./_examples/example.yml)), to stub specific API calls. By default, `ersatz` expects your fixtures file to be in the `.ft` folder at the root of your project.
 
 For example, to stub an `/__health` API call, you can use the following configuration:
 
@@ -44,8 +44,75 @@ Similarly, to stub a `/__gtg` API call:
 Once you have created your file, start `ersatz` with:
 
 ```
-ersatz --port 8080 ./fixtures.yml
+ersatz
 ```
+
+You can optionally specify a port and fixtures file to use:
+
+```
+ersatz -p 8080 -f ./.ft/fixtures.yml
+```
+
+# CircleCI Usage
+
+The recommended way to run `ersatz` and `dredd` via CircleCI is to use the `ersatz` Docker container. This prevents `ersatz` conflicting with your project's dependencies. First, add the following `dredd` hook script to your project, and reference it in your `dredd.yml`:
+
+```
+var hooks = require('hooks');
+var http = require('http');
+var fs = require('fs');
+
+hooks.beforeAll(function(t, done) {
+   var contents = fs.readFileSync('./.ft/fixtures.yml', 'utf8');
+
+   var options = {
+      host: 'localhost',
+      port: '9000',
+      path: '/__configure',
+      method: 'POST',
+      headers: {
+         'Content-Type': 'application/x-yaml'
+      }
+   };
+
+   var req = http.request(options, function(res) {
+      res.setEncoding('utf8');
+   });
+
+   req.write(contents);
+   req.end();
+   done();
+});
+```
+
+Then configure your dredd build to run ersatz in a secondary container (make sure you change the following config to use appropriate docker container versions for your app):
+
+```
+dredd:
+    working_directory: /go/src/github.com/Financial-Times/draft-content-api
+    docker:
+      - image: bankrs/golang-dredd:gox.x.x-dreddx.x.x
+        environment:
+          GOPATH: /go
+          ...
+      - image: peteclark-ft/ersatz:x.x.x
+    steps:
+      - checkout
+      - run:
+          name: External Dependencies
+          command: |
+            go get -u github.com/kardianos/govendor
+      - run:
+          name: Govendor Sync
+          command: govendor sync -v
+      - run:
+          name: Go Build
+          command: go build -v
+      - run:
+          name: Dredd API Testing
+          command: dredd
+```
+
 
 # More Configuration Examples
 
