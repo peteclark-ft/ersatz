@@ -30,7 +30,7 @@ func main() {
 
 	fixtures := app.String(cli.StringOpt{
 		Name:   "fixtures f",
-		Value:  "./.ft/fixtures.yml",
+		Value:  "./_ft/fixtures.yml",
 		Desc:   "Fixtures file to use to simulate requests",
 		EnvVar: "FIXTURES",
 	})
