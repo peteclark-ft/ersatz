@@ -95,7 +95,7 @@ dredd:
         environment:
           GOPATH: /go
           ...
-      - image: peteclark-ft/ersatz:x.x.x
+      - image: peteclark-ft/ersatz:stable
     steps:
       - checkout
       - run:
@@ -113,6 +113,13 @@ dredd:
           command: dredd
 ```
 
+# Docker Image versions
+
+The following ersatz docker versions are supported:
+
+* `latest` - is the latest commit to master
+* `stable` - is the latest full release tag in Github
+* `x.x.x` - specific tag versions (see [Releases](./releases) for more information)
 
 # More Configuration Examples
 
