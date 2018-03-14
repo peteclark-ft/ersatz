@@ -13,7 +13,7 @@ go get github.com/peteclark-ft/ersatz
 
 # Usage
 
-First create a `fixtures.yml` file (see full example file [here](./_examples/example.yml)), to stub specific API calls. By default, `ersatz` expects your fixtures file to be in the `.ft` folder at the root of your project.
+First create a `fixtures.yml` file (see full example file [here](./_examples/example.yml)), to stub specific API calls. By default, `ersatz` expects your fixtures file to be in the `_ft` folder at the root of your project.
 
 For example, to stub an `/__health` API call, you can use the following configuration:
 
@@ -50,7 +50,7 @@ ersatz
 You can optionally specify a port and fixtures file to use:
 
 ```
-ersatz -p 8080 -f ./.ft/fixtures.yml
+ersatz -p 8080 -f ./_ft/fixtures.yml
 ```
 
 # CircleCI Usage
@@ -63,7 +63,7 @@ var http = require('http');
 var fs = require('fs');
 
 hooks.beforeAll(function(t, done) {
-   var contents = fs.readFileSync('./.ft/fixtures.yml', 'utf8');
+   var contents = fs.readFileSync('./_ft/fixtures.yml', 'utf8');
 
    var options = {
       host: 'localhost',
