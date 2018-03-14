@@ -7,7 +7,7 @@ import (
 	"github.com/peteclark-ft/ersatz/v1"
 )
 
-var ErrUnsupportedVersion = errors.New("unsupported ersatz version, please confirm the fixtures.yml version number")
+var ErrUnsupportedVersion = errors.New("unsupported ersatz version, please confirm the ersatz-fixtures.yml version number")
 
 type ersatz struct {
 	Version  string   `json:"version"`
