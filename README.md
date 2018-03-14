@@ -13,7 +13,7 @@ go get github.com/peteclark-ft/ersatz
 
 # Usage
 
-First create a `fixtures.yml` file (see full example file [here](./_examples/example.yml)), to stub specific API calls. By default, `ersatz` expects your fixtures file to be in the `.ft` folder at the root of your project.
+First create a `ersatz-fixtures.yml` file (see full example file [here](./_examples/example.yml)), to stub specific API calls. By default, `ersatz` expects your fixtures file to be in the `_ft` folder at the root of your project.
 
 For example, to stub an `/__health` API call, you can use the following configuration:
 
@@ -50,7 +50,7 @@ ersatz
 You can optionally specify a port and fixtures file to use:
 
 ```
-ersatz -p 8080 -f ./.ft/fixtures.yml
+ersatz -p 8080 -f ./_ft/ersatz-fixtures.yml
 ```
 
 # CircleCI Usage
@@ -63,7 +63,7 @@ var http = require('http');
 var fs = require('fs');
 
 hooks.beforeAll(function(t, done) {
-   var contents = fs.readFileSync('./.ft/fixtures.yml', 'utf8');
+   var contents = fs.readFileSync('./_ft/ersatz-fixtures.yml', 'utf8');
 
    var options = {
       host: 'localhost',
@@ -183,7 +183,7 @@ Ersatz also supports multiple expectations provided in an array; at least one ex
 # Why is Ersatz Useful?
 
 * It's useful for local developer testing - you'd no longer need to point your local machine to real services in a test cluster.
-* `fixtures.yml` files can be committed along with the codebase, so new developers can re-use your stubs to get up and running quickly.
+* `ersatz-fixtures.yml` files can be committed along with the codebase, so new developers can re-use your stubs to get up and running quickly.
 * We can use it to simulate complex dependencies in CircleCI, allowing us to more easily test our OpenAPI files using DreddJS
 
 # Road Map

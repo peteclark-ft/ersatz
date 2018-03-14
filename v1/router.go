@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// MockPaths adds endpoints to the provided router as per the fixtures.yml
+// MockPaths adds endpoints to the provided router as per the ersatz-fixtures.yml
 func MockPaths(r Router, paths *Fixtures) {
 	for p, path := range *paths {
 		for method, resource := range path {
