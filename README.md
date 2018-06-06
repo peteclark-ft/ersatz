@@ -79,7 +79,7 @@ For specifying multiple use cases for the same path-method pair you should use s
         queryParams:
           expect: value1
 ```
-Keep in mind that for making this work as expected, the order of the use cases matters. The next use case is used only if the expectations are not satisfied. If all resources are skipped because of their expectations a `501 Not Implemented` will be returned.
+Keep in mind that for making this work as expected, the order of the use cases matters. The next use case is used only if the expectations are not satisfied. If all resources are skipped because of their expectations, a `501 Not Implemented` will be returned.
 
 **Add more complex `expectations` conditions**
 
