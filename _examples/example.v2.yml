@@ -1,0 +1,17 @@
+version: "2.0.0"
+fixtures:
+  /expect:
+    put:
+    - status: 400
+      headers:
+        x-returned-header: returned
+      expectations:
+      - queryParams:
+          expect: $#exists#$
+          expect-2: $#exists#$
+    - status: 200
+      headers:
+        x-returned-header: returned
+      expectations:
+        queryParams:
+          expect: $#exists#$

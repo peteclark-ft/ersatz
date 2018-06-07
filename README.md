@@ -13,6 +13,8 @@ go get github.com/peteclark-ft/ersatz
 
 # Usage
 
+## Version 1.0.0 fixtures
+
 First create a `ersatz-fixtures.yml` file (see full example file [here](./_examples/example.yml)), to stub specific API calls. By default, `ersatz` expects your fixtures file to be in the `_ft` folder at the root of your project.
 
 For example, to stub an `/__health` API call, you can use the following configuration:
@@ -52,6 +54,53 @@ You can optionally specify a port and fixtures file to use:
 ```
 ersatz -p 8080 -f ./_ft/ersatz-fixtures.yml
 ```
+
+## Version 2.0.0 fixtures
+For more complex use cases, you can use `version: 2.0.0` in your fixtures file.
+
+**Specify multiple use cases for the same path-method pair**
+
+
+For specifying multiple use cases for the same path-method pair you should use something like this:
+```
+/expect:
+    put: # this is an array of resources and not just a resource
+    - status: 400
+      headers:
+        x-returned-header: returned
+      expectations:
+      - queryParams:
+          expect: value1
+          expect-2: value2
+    - status: 200
+      headers:
+        x-returned-header: returned
+      expectations:
+        queryParams:
+          expect: value1
+```
+Keep in mind that for making this work as expected, the order of the use cases matters. The next use case is used only if the expectations are not satisfied. If all resources are skipped because of their expectations, a `501 Not Implemented` will be returned.
+
+**Add more complex `expectations` conditions**
+
+```
+/expect:
+    put: # this is an array of resources and not just a resource
+    - status: 400
+      headers:
+        x-returned-header: returned
+      expectations:
+      - queryParams:
+          expect: ${miss}
+          expect-2: value-for-expect2
+        headers:
+          Content-Type: ${exists}
+```
+
+`${miss}` - check if the query parameter or header is missing
+`${exists}` - check if the query parameter or header exists, but does not check it for a specific value.
+
+
 
 # CircleCI Usage
 
