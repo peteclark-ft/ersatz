@@ -183,8 +183,8 @@ func TestMockAllExpectationsSuccess(t *testing.T) {
 
 func TestMockMultipleResources(t *testing.T) {
 	expect1 := NewExpectation()
-	expect1.QueryParams.Add("not-there", "$#miss#$")
-	expect1.QueryParams.Add("but-im-there", "$#miss#$")
+	expect1.QueryParams.Add("not-there", "${miss}")
+	expect1.QueryParams.Add("but-im-there", "${miss}")
 
 	res1 := Resource{
 		Status:       http.StatusAccepted,

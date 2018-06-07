@@ -6,17 +6,29 @@ import (
 	"net/http"
 	"net/textproto"
 	"net/url"
-	"strings"
+	"regexp"
 
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	expectationActionPrefix = "$#"
-	expectationActionSuffix = "#$"
+type actionValidationFunc func(value string) error
 
-	expectationActionExists  = "exists"
-	expectationActionMissing = "miss"
+var (
+	expectationActionRegex    = regexp.MustCompile("^\\$\\{(?P<action>.+)\\}$")
+	expectationActionsMapping = map[string]actionValidationFunc{
+		"exists": func(value string) error {
+			if len(value) == 0 {
+				return fmt.Errorf("expected value")
+			}
+			return nil
+		},
+		"miss": func(value string) error {
+			if len(value) > 0 {
+				return fmt.Errorf("expected missing value")
+			}
+			return nil
+		},
+	}
 )
 
 type Expectations []Expectation
@@ -111,17 +123,10 @@ func (e ExpectedHeaders) Validate(actual http.Header) error {
 	for name := range e.MIMEHeader {
 		expected := e.Get(name)
 		value := actual.Get(name)
-		if strings.HasPrefix(expected, expectationActionPrefix) && strings.HasSuffix(expected, expectationActionSuffix) {
-			expectationAction := strings.Replace(expected, expectationActionPrefix, "", -1)
-			expectationAction = strings.Replace(expectationAction, expectationActionSuffix, "", -1)
-			if expectationAction != expectationActionExists && expectationAction != expectationActionMissing {
-				return fmt.Errorf("invalid given action '%s'", expectationAction)
-			}
-			if expectationAction == expectationActionExists && len(value) == 0 {
-				return fmt.Errorf("expected to find any value for header '%v'", name)
-			}
-			if expectationAction == expectationActionMissing && len(value) > 0 {
-				return fmt.Errorf("expected missing '%v' header", name)
+
+		if containsAction, err := checkExpectationAction(name, expected, value); containsAction {
+			if err != nil {
+				return err
 			}
 			continue
 		}
@@ -160,17 +165,10 @@ func (e ExpectedQueryParams) Validate(actual url.Values) error {
 	for name := range e.Values {
 		expected := e.Get(name)
 		value := actual.Get(name)
-		if strings.HasPrefix(expected, expectationActionPrefix) && strings.HasSuffix(expected, expectationActionSuffix) {
-			expectationAction := strings.Replace(expected, expectationActionPrefix, "", -1)
-			expectationAction = strings.Replace(expectationAction, expectationActionSuffix, "", -1)
-			if expectationAction != expectationActionExists && expectationAction != expectationActionMissing {
-				return fmt.Errorf("invalid given action '%s'", expectationAction)
-			}
-			if expectationAction == expectationActionExists && len(value) == 0 {
-				return fmt.Errorf("expected to find any value for query param '%v'", name)
-			}
-			if expectationAction == expectationActionMissing && len(value) > 0 {
-				return fmt.Errorf("expected missing '%v' query param", name)
+
+		if containsAction, err := checkExpectationAction(name, expected, value); containsAction {
+			if err != nil {
+				return err
 			}
 			continue
 		}
@@ -191,4 +189,14 @@ func Contains(expected string, actual ...string) bool {
 		}
 	}
 	return false
+}
+
+// Check if the actual value contains a known action, and if it is, check against it
+func checkExpectationAction(dataKey, expected, actual string) (bool, error) {
+	matches := expectationActionRegex.FindStringSubmatch(expected)
+	if len(matches) == 0 {
+		return false, nil
+	}
+
+	return true, expectationActionsMapping[matches[1]](actual) // jump directly to the #1 index because the regex match only one placeholder in the same string (ie: ${action})
 }

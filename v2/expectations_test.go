@@ -139,8 +139,8 @@ func TestExistsExpectation(t *testing.T) {
 	e := Expectation{
 		QueryParams: ExpectedQueryParams{
 			map[string][]string{
-				"not_me": []string{"$#miss#$"},
-				"but_me": []string{"$#exists#$"},
+				"not_me": []string{"${miss}"},
+				"but_me": []string{"${exists}"},
 			},
 		},
 	}
