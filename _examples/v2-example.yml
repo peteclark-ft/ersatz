@@ -1,11 +1,31 @@
-version: 1.0.0-rc1
+version: 2.0.0-rc1
 fixtures:
   /__gtg:
     get:
-      status: 200
-      headers:
-        content-type: text/plain; charset=US-ASCII
-      body: OK
+      - when:
+          headers:
+            X-Example: someExactValue
+        response:
+          status: 400
+          headers:
+            content-type: text/plain; charset=US-ASCII
+          body: Bad Request
+      - when:
+          headers:
+            X-Example: ${exists}
+        response:
+          status: 200
+          headers:
+            content-type: text/plain; charset=US-ASCII
+          body: OK
+      - when:
+          headers:
+            X-Example: ${missing}
+        response:
+          status: 503
+          headers:
+            content-type: text/plain; charset=US-ASCII
+          body: Failed
   /__health:
     get:
       status: 200

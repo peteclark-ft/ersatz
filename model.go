@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/peteclark-ft/ersatz/v1"
+	"github.com/peteclark-ft/ersatz/v2"
 )
 
 var ErrUnsupportedVersion = errors.New("unsupported ersatz version, please confirm the ersatz-fixtures.yml version number")
@@ -38,6 +39,8 @@ func (e *ersatz) UnmarshalJSON(data []byte) error {
 	case "1.0.0-rc1":
 	case "1.0.0":
 		f.Fixtures = &v1.Fixtures{}
+	case "2.0.0-rc1":
+		f.Fixtures = &v2.Fixtures{}
 	default:
 		return ErrUnsupportedVersion
 	}

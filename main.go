@@ -11,6 +11,7 @@ import (
 	"github.com/husobee/vestigo"
 	"github.com/jawher/mow.cli"
 	"github.com/peteclark-ft/ersatz/v1"
+	"github.com/peteclark-ft/ersatz/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -100,6 +101,8 @@ func configureErsatz(ersatz ersatz) {
 	case "1.0.0-rc1":
 	case "1.0.0":
 		v1.MockPaths(unmonitoredRouter, ersatz.Fixtures.(*v1.Fixtures))
+	case "2.0.0-rc1":
+		v2.MockPaths(unmonitoredRouter, ersatz.Fixtures.(*v2.Fixtures))
 	default:
 		log.Fatal(ErrUnsupportedVersion.Error())
 	}
