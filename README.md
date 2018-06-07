@@ -91,14 +91,14 @@ Keep in mind that for making this work as expected, the order of the use cases m
         x-returned-header: returned
       expectations:
       - queryParams:
-          expect: $#miss#$
+          expect: ${miss}
           expect-2: value-for-expect2
         headers:
-          Content-Type: $#exists#$
+          Content-Type: ${exists}
 ```
 
-`$#miss#$` - check if the query parameter or header is missing
-`$#exists#$` - check if the query parameter or header exists, but does not check it for a specific value.
+`${miss}` - check if the query parameter or header is missing
+`${exists}` - check if the query parameter or header exists, but does not check it for a specific value.
 
 
 
