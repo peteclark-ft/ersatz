@@ -40,6 +40,7 @@ func (e *ersatz) UnmarshalJSON(data []byte) error {
 	case "1.0.0":
 		f.Fixtures = &v1.Fixtures{}
 	case "2.0.0-rc1":
+	case "2.0.0":
 		f.Fixtures = &v2.Fixtures{}
 	default:
 		return ErrUnsupportedVersion
