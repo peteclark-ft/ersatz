@@ -169,7 +169,7 @@ Example endpoint with a request discriminator. In some cases, the same endpoint 
           x-user: the-second-user
         queryParams:
           id: the-second-id
-      response: # Response slightly differently
+      response: # Respond slightly differently
         status: 200
         headers:
           x-returned-header: a-different-header
