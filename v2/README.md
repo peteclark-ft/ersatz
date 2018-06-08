@@ -27,3 +27,7 @@ Discriminators are matched **in order**; if many discriminators match the same r
    * `headers`: A map (key: string, value: string) of headers to look for the in the request.
    * `queryParams`: A map (key: string, value: string) of query parameters to look for the in the request.
 * **Required** `response`: A [Response Object](#response-object) which will be used if the request matches the headers and query parameters specified.
+
+Additionally, values included in the `when` statement can take the following formats:
+* `${exists}`: Specifies that any value is acceptable for the header or query parameter, but it must be present.
+* `${missing}`: Specifies that the value must not be present in the request.
