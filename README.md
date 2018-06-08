@@ -18,7 +18,7 @@ First create a `ersatz-fixtures.yml` file (see full example file [here](./_examp
 For example, to stub an `/__health` API call, you can use the following configuration:
 
 ```
-version: 1.0.0 # the ersatz fixtures version. Releases will be backwards compatible
+version: 2.0.0 # the ersatz fixtures version. Releases will try to be backwards compatible
 fixtures:
    /__health: # the path of the stub
       get: # the http method
@@ -150,34 +150,51 @@ Example redirect configuration to google.com:
          Location: http://www.google.com
 ```
 
-Example endpoint with expected `headers` and `queryParams`. Ersatz will respond with a `501 Unimplemented` to requests that do no match the configured expectations, which __should__ cause your sandbox tests to fail.
+Example endpoint with a request discriminator. In some cases, the same endpoint path will respond differently to different input `queryParams` or `headers`, and so you need to discriminate between them. Ersatz will respond with a `501 Unimplemented` to requests that do no match any of the configured requests, which __should__ cause your sandbox tests to fail.
 
 ```
-/expect:
-   put:
-      status: 200
-      headers:
-        x-returned-header: returned
-      expectations:
+/id:
+  get:
+    - when: # When the request has the following headers and queryParams
         headers:
-          x-expected-header: expected
+          x-user: the-first-user
         queryParams:
-          param-name: expected-this-too
+          id: the-first-id
+      response: # Respond with the following
+        status: 200
+        headers:
+          x-returned-header: returned
+    - when: # Otherwise, when the request has the following headers and queryParams
+        headers:
+          x-user: the-second-user
+        queryParams:
+          id: the-second-id
+      response: # Response slightly differently
+        status: 200
+        headers:
+          x-returned-header: a-different-header
 ```
 
-Ersatz also supports multiple expectations provided in an array; at least one expectation must much each request for the simulation to proceed, otherwise, it will return a `501 Unimplemented`.
+Ersatz also supports a basic syntax for specifying discriminators for when headers are any value, or are missing.
 
 ```
-/expect:
-  put:
-    status: 200
-      headers:
-        x-returned-header: returned
-    expectations:
-      - headers:
-          x-expected-header: expected
-      - queryParams:
-          param-name: expected-this-too
+/search:
+  get:
+    - when:
+        queryParams:
+          q: ${exists} # if a query param "q" exists
+      response: # Respond with the following
+        status: 200
+        body:
+          search_results:
+            - id: 1
+    - when: # Otherwise, if the request has no query param "q"
+        queryParams:
+          q: ${missing}
+      response:
+        status: 400
+        body:
+          msg: Please supply a "q" query param
 ```
 
 # Why is Ersatz Useful?
@@ -190,3 +207,4 @@ Ersatz also supports multiple expectations provided in an array; at least one ex
 
 * Support OpenAPI for more accurate stubs
 * Comparisons between fixtures and the real API it is mocking
+* Regex Discriminators

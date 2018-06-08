@@ -62,3 +62,25 @@ fixtures:
           x-expected-header: expected
         queryParams:
           expect: expected-this-too
+
+
+/id:
+  get:
+    - when:
+        headers:
+          x-user: the-first-user
+        queryParams:
+          id: the-first-id
+      response:
+        status: 200
+        headers:
+          x-returned-header: returned
+    - when:
+        headers:
+          x-user: the-second-user
+        queryParams:
+          id: the-second-id
+      response:
+        status: 200
+        headers:
+          x-returned-header: a-different-header
