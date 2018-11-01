@@ -11,6 +11,7 @@ import (
 	"github.com/husobee/vestigo"
 	"github.com/jawher/mow.cli"
 	"github.com/peteclark-ft/ersatz/v1"
+	"github.com/peteclark-ft/ersatz/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -42,13 +43,13 @@ func main() {
 			return
 		}
 
-		ersatz := ersatz{}
-		err = yaml.Unmarshal(yml, &ersatz)
+		ers := ersatz{}
+		err = yaml.Unmarshal(yml, &ers)
 		if err != nil {
 			log.WithError(err).Fatal("Failed to unmarshal yaml in provided fixtures file")
 		}
 
-		runServer(*port, &ersatz)
+		runServer(*port, &ers)
 	}
 
 	app.Run(os.Args)
@@ -62,8 +63,8 @@ func acceptFixtures(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ersatz := ersatz{}
-	err = yaml.Unmarshal(yml, &ersatz)
+	ers := ersatz{}
+	err = yaml.Unmarshal(yml, &ers)
 	if err != nil {
 		log.WithError(err).Error("Failed to unmarshal yaml")
 		http.Error(w, "Failed to unmarshal yaml", http.StatusBadRequest)
@@ -71,16 +72,16 @@ func acceptFixtures(w http.ResponseWriter, req *http.Request) {
 	}
 
 	configureOnce.Do(func() {
-		configureErsatz(ersatz)
+		configureErsatz(ers)
 	})
 
 	log.Info("Configured fixtures via /__configure endpoint, further requests to this endpoint will not reconfigure ersatz.")
 	w.WriteHeader(http.StatusOK)
 }
 
-func runServer(port string, ersatz *ersatz) {
-	if ersatz != nil {
-		configureErsatz(*ersatz)
+func runServer(port string, ers *ersatz) {
+	if ers != nil {
+		configureErsatz(*ers)
 	} else {
 		log.Info("No fixtures file found, ready to accept fixtures data on POST /__configure")
 		http.HandleFunc("/__configure", acceptFixtures)
@@ -91,15 +92,18 @@ func runServer(port string, ersatz *ersatz) {
 	}
 }
 
-func configureErsatz(ersatz ersatz) {
+func configureErsatz(ers ersatz) {
 	unmonitoredRouter := vestigo.NewRouter()
 	var r http.Handler = unmonitoredRouter
 	r = httphandlers.TransactionAwareRequestLoggingHandler(log.StandardLogger(), r)
 
-	switch ersatz.Version {
+	switch ers.Version {
 	case "1.0.0-rc1":
 	case "1.0.0":
-		v1.MockPaths(unmonitoredRouter, ersatz.Fixtures.(*v1.Fixtures))
+		v1.MockPaths(unmonitoredRouter, ers.Fixtures.(*v1.Fixtures))
+	case "2.0.0-rc1":
+	case "2.0.0":
+		v2.MockPaths(unmonitoredRouter, ers.Fixtures.(*v2.Fixtures))
 	default:
 		log.Fatal(ErrUnsupportedVersion.Error())
 	}
